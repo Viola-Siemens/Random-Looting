@@ -1,0 +1,8 @@
+{
+  "language": "Japanese",
+  "language.code": "ja_jp",
+  "language.region": "Japan",
+  
+  "commands.randomlooting.reshuffle.success": "ルートテーブルはめちゃくちゃになりました！",
+  "commands.randomlooting.revoke.success": "ルートテーブルは本来の様子に戻りました。"
+}

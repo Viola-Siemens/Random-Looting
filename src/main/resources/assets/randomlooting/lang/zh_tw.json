@@ -1,0 +1,8 @@
+{
+  "language": "Chinese",
+  "language.code": "zh_tw",
+  "language.region": "Taiwan, China",
+  
+  "commands.randomlooting.reshuffle.success": "戰利品表已經被重新打亂！",
+  "commands.randomlooting.revoke.success": "戰利品表恢復正常了。"
+}

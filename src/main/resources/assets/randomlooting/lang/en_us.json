@@ -1,0 +1,8 @@
+{
+  "language": "English",
+  "language.code": "en_us",
+  "language.region": "United States",
+  
+  "commands.randomlooting.reshuffle.success": "Loot tables are successfully reshuffled!",
+  "commands.randomlooting.revoke.success": "Loot tables are now back to normal."
+}

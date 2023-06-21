@@ -2,6 +2,7 @@ package com.hexagram2021.randomlooting.config;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.List;
@@ -40,7 +41,8 @@ public class RLServerConfig {
 					), o -> ResourceLocation.isValidResourceLocation((String)o));
 			WHITELIST_LOOTS = BUILDER.comment("The whitelist of loot tables that will not be messed up by this mod. For example, \"minecraft:blocks/acacia_planks\" to make sure you can always get acacia planks after breaking the corresponding block.")
 					.defineList("WHITELIST_LOOTS", ImmutableList.of(
-							new ResourceLocation("entities/ender_dragon").toString()
+							new ResourceLocation("entities/ender_dragon").toString(),
+							BuiltInLootTables.EMPTY.toString()
 					), o -> ResourceLocation.isValidResourceLocation((String)o));
 
 			AUTO_REFRESH_SECOND = BUILDER.comment("Set to x (x > 0), server will automatically reshuffle loot tables every x seconds. Set to 0 to disable.")

@@ -1,6 +1,7 @@
 package com.hexagram2021.randomlooting.command;
 
 import com.hexagram2021.randomlooting.config.RLServerConfig;
+import com.hexagram2021.randomlooting.util.IMessUpLootTables;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.LongArgumentType;
@@ -10,7 +11,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.network.protocol.game.ClientboundUpdateRecipesPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -53,8 +53,7 @@ public class RLCommands {
 
 	private static int revoke(MinecraftServer server) {
 		RLServerConfig.DISABLE.set(true);
-		((IMessUpRecipes) server.getLootTables()).revoke();
-		sendRecipeUpdatePacket(server);
+		((IMessUpLootTables) server.getLootTables()).revoke();
 		server.getPlayerList().broadcastMessage(new TranslatableComponent("commands.randomlooting.revoke.success"), ChatType.SYSTEM, Util.NIL_UUID);
 		return Command.SINGLE_SUCCESS;
 	}
@@ -62,16 +61,6 @@ public class RLCommands {
 	public static void messup(MinecraftServer server) {
 		long seed = server.getWorldData().worldGenSettings().seed() ^ RLServerConfig.SALT.get();
 		Random random = new Random(seed);
-		((IMessUpRecipes) server.getLootTables()).messup(random);
-		sendRecipeUpdatePacket(server);
-	}
-
-	private static void sendRecipeUpdatePacket(MinecraftServer server) {
-		ClientboundUpdateRecipesPacket clientboundupdaterecipespacket = new ClientboundUpdateRecipesPacket(server.getRecipeManager().getRecipes());
-
-		for(ServerPlayer serverplayer : server.getPlayerList().getPlayers()) {
-			serverplayer.connection.send(clientboundupdaterecipespacket);
-			serverplayer.getRecipeBook().sendInitialRecipeBook(serverplayer);
-		}
+		((IMessUpLootTables) server.getLootTables()).messup(random);
 	}
 }

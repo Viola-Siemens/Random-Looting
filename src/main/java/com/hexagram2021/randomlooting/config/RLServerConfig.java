@@ -41,6 +41,8 @@ public class RLServerConfig {
 					), o -> ResourceLocation.isValidResourceLocation((String)o));
 			WHITELIST_LOOTS = BUILDER.comment("The whitelist of loot tables that will not be messed up by this mod. For example, \"minecraft:blocks/acacia_planks\" to make sure you can always get acacia planks after breaking the corresponding block.")
 					.defineList("WHITELIST_LOOTS", ImmutableList.of(
+							new ResourceLocation("gameplay/fishing").toString(),	//Avoid Infinite Recursion
+							new ResourceLocation("entities/sheep").toString(),		//Avoid Infinite Recursion
 							new ResourceLocation("entities/ender_dragon").toString(),
 							BuiltInLootTables.EMPTY.toString()
 					), o -> ResourceLocation.isValidResourceLocation((String)o));

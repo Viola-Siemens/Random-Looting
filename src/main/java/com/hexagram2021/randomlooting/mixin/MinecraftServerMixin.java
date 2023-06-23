@@ -3,11 +3,11 @@ package com.hexagram2021.randomlooting.mixin;
 import com.hexagram2021.randomlooting.command.RLCommands;
 import com.hexagram2021.randomlooting.config.RLServerConfig;
 import com.hexagram2021.randomlooting.util.RLLogger;
-import net.minecraft.Util;
 import net.minecraft.network.chat.ChatType;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Random;
 import java.util.function.BooleanSupplier;
 
 @Mixin(MinecraftServer.class)
@@ -28,7 +27,7 @@ public abstract class MinecraftServerMixin {
 	private ProfilerFiller profiler;
 
 	@Shadow @Final
-	private Random random;
+	private RandomSource random;
 
 	@Shadow
 	public abstract PlayerList getPlayerList();
@@ -50,8 +49,8 @@ public abstract class MinecraftServerMixin {
 				RLServerConfig.SALT.set(this.random.nextLong());
 				RLCommands.messup((MinecraftServer)(Object)this);
 				if(RLServerConfig.AUTO_REFRESH_CALLBACK.get()) {
-					this.getPlayerList().broadcastMessage(
-							new TranslatableComponent("commands.randomlooting.reshuffle.success"), ChatType.SYSTEM, Util.NIL_UUID
+					this.getPlayerList().broadcastSystemMessage(
+							Component.translatable("commands.randomlooting.reshuffle.success"), ChatType.SYSTEM
 					);
 				}
 				this.profiler.pop();

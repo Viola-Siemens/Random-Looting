@@ -8,7 +8,6 @@ import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,14 +45,14 @@ public class RLCommands {
 			RLServerConfig.DISABLE.set(false);
 		}
 		messup(server);
-		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomlooting.reshuffle.success"), ChatType.SYSTEM);
+		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomlooting.reshuffle.success"), false);
 		return Command.SINGLE_SUCCESS;
 	}
 
 	private static int revoke(MinecraftServer server) {
 		RLServerConfig.DISABLE.set(true);
 		((IMessUpLootTables) server.getLootTables()).revoke();
-		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomlooting.revoke.success"), ChatType.SYSTEM);
+		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomlooting.revoke.success"), false);
 		return Command.SINGLE_SUCCESS;
 	}
 

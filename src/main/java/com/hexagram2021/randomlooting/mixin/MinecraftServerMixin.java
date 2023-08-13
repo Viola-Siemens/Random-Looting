@@ -3,7 +3,6 @@ package com.hexagram2021.randomlooting.mixin;
 import com.hexagram2021.randomlooting.command.RLCommands;
 import com.hexagram2021.randomlooting.config.RLServerConfig;
 import com.hexagram2021.randomlooting.util.RLLogger;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
@@ -49,9 +48,7 @@ public abstract class MinecraftServerMixin {
 				RLServerConfig.SALT.set(this.random.nextLong());
 				RLCommands.messup((MinecraftServer)(Object)this);
 				if(RLServerConfig.AUTO_REFRESH_CALLBACK.get()) {
-					this.getPlayerList().broadcastSystemMessage(
-							Component.translatable("commands.randomlooting.reshuffle.success"), ChatType.SYSTEM
-					);
+					this.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomlooting.reshuffle.success"), false);
 				}
 				this.profiler.pop();
 			} else {

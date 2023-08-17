@@ -57,7 +57,7 @@ public class RLCommands {
 	}
 
 	public static void messup(MinecraftServer server) {
-		long seed = server.getWorldData().worldGenSettings().seed() ^ RLServerConfig.SALT.get();
+		long seed = server.getWorldData().worldGenOptions().seed() ^ RLServerConfig.SALT.get();
 		Random random = new Random(seed);
 		((IMessUpLootTables) server.getLootTables()).messup(random);
 	}

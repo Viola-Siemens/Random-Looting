@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[42,)"
+loaderVersion="[44,)"
 license="LGPL"
 issueTrackerURL="https://github.com/Viola-Siemens/Random-Looting/issues"
 
@@ -17,13 +17,13 @@ All loot tables are messed up by this mod. You may be able to get a wheat seed a
 [[dependencies.randomlooting]]
     modId="forge"
     mandatory=true
-    versionRange="[42,)"
+    versionRange="[44,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.randomlooting]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19.1,1.20)"
+    versionRange="[1.19.3,1.20)"
     ordering="NONE"
     side="BOTH"

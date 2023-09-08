@@ -31,20 +31,20 @@ public abstract class MinecraftServerMixin {
 	@Shadow
 	public abstract PlayerList getPlayerList();
 
-	private int lastAutoRefreshRecipeTick = 0;
+	private int lastAutoRefreshLootTableTick = 0;
 	
 	private boolean nextReshuffle = true;
 
 	@Inject(method = "tickServer", at = @At(value = "TAIL"))
 	public void tryReshuffling(BooleanSupplier hasTime, CallbackInfo ci) {
 		long second = RLServerConfig.AUTO_REFRESH_SECOND.get();
-		if(second > 0 && this.tickCount - this.lastAutoRefreshRecipeTick >= second * 20) {
+		if(second > 0 && this.tickCount - this.lastAutoRefreshLootTableTick >= second * 20) {
 			if(RLServerConfig.DISABLE.get()) {
 				this.nextReshuffle = false;
 			} else if(this.nextReshuffle) {
-				this.lastAutoRefreshRecipeTick = this.tickCount;
-				RLLogger.debug("Auto refresh recipes!");
-				this.profiler.push("randomlooting:refresh_recipes");
+				this.lastAutoRefreshLootTableTick = this.tickCount;
+				RLLogger.debug("Auto refresh loot tables!");
+				this.profiler.push("randomlooting:refresh_loot_tables");
 				RLServerConfig.SALT.set(this.random.nextLong());
 				RLCommands.messup((MinecraftServer)(Object)this);
 				if(RLServerConfig.AUTO_REFRESH_CALLBACK.get()) {
@@ -52,7 +52,7 @@ public abstract class MinecraftServerMixin {
 				}
 				this.profiler.pop();
 			} else {
-				this.lastAutoRefreshRecipeTick = this.tickCount;
+				this.lastAutoRefreshLootTableTick = this.tickCount;
 				this.nextReshuffle = true;
 			}
 		}

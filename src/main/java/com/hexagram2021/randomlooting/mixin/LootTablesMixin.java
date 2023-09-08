@@ -3,15 +3,14 @@ package com.hexagram2021.randomlooting.mixin;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonElement;
 import com.hexagram2021.randomlooting.config.RLServerConfig;
 import com.hexagram2021.randomlooting.util.IMessUpLootTables;
 import com.hexagram2021.randomlooting.util.RLLogger;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.storage.loot.LootDataId;
+import net.minecraft.world.level.storage.loot.LootDataManager;
+import net.minecraft.world.level.storage.loot.LootDataType;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,36 +18,47 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import javax.annotation.Nullable;
+import java.util.*;
 
-@Mixin(LootTables.class)
+@Mixin(LootDataManager.class)
 public class LootTablesMixin implements IMessUpLootTables {
 	@Shadow
-	private Map<ResourceLocation, LootTable> tables;
+	private Map<LootDataId<?>, ?> elements;
 	
+	@Nullable
 	private Map<ResourceLocation, LootTable> backup_tables;
 	
-	@Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At(value = "TAIL"))
-	public void init_backups(Map<ResourceLocation, JsonElement> jsonMap, ResourceManager resourceManager, ProfilerFiller profilerFiller, CallbackInfo ci) {
-		this.backup_tables = ImmutableMap.copyOf(this.tables);
+	@Inject(method = "apply", at = @At(value = "TAIL"))
+	public void init_backups(Map<LootDataType<?>, Map<ResourceLocation, ?>> map, CallbackInfo ci) {
+		ImmutableMap.Builder<ResourceLocation, LootTable> builder = ImmutableMap.builder();
+		this.elements.forEach((id, o) -> {
+			if(id.type().equals(LootDataType.TABLE)) {
+				builder.put(id.location(), (LootTable)o);
+			}
+		});
+		this.backup_tables = builder.build();
 	}
 	
 	@Override
 	public void revoke() {
-		ImmutableMap.Builder<ResourceLocation, LootTable> builder = ImmutableMap.builder();
-		this.backup_tables.forEach(builder::put);
-		this.tables = builder.build();
+		ImmutableMap.Builder<LootDataId<?>, Object> builder = ImmutableMap.builder();
+		this.elements.forEach((id, o) -> {
+			if(!id.type().equals(LootDataType.TABLE)) {
+				builder.put(id, o);
+			}
+		});
+		Objects.requireNonNull(this.backup_tables).forEach((id, lt) -> builder.put(new LootDataId<>(LootDataType.TABLE, id), lt));
+		this.elements = builder.build();
 	}
 	
 	@Override
 	public void messup(Random random) {
 		List<ResourceLocation> ids = Lists.newArrayList();
 		List<LootTable> results = Lists.newArrayList();
-		ImmutableMap.Builder<ResourceLocation, LootTable> whitelist_builder = ImmutableMap.builder();
+		ImmutableMap.Builder<LootDataId<?>, Object> whitelist_builder = ImmutableMap.builder();
 		
+		assert this.backup_tables != null;
 		if(RLServerConfig.TYPE_SEPARATED.get()) {
 			Map<ResourceLocation, List<LootTable>> separatedTables = Maps.newHashMap();
 			
@@ -83,10 +93,10 @@ public class LootTablesMixin implements IMessUpLootTables {
 							results.add(toAdd);
 						}
 					} else {
-						whitelist_builder.put(id, lootTable);
+						whitelist_builder.put(new LootDataId<>(LootDataType.TABLE, id), lootTable);
 					}
 				} else {
-					whitelist_builder.put(id, lootTable);
+					whitelist_builder.put(new LootDataId<>(LootDataType.TABLE, id), lootTable);
 				}
 			});
 		} else {
@@ -97,10 +107,10 @@ public class LootTablesMixin implements IMessUpLootTables {
 						ids.add(id);
 						results.add(lootTable);
 					} else {
-						whitelist_builder.put(id, lootTable);
+						whitelist_builder.put(new LootDataId<>(LootDataType.TABLE, id), lootTable);
 					}
 				} else {
-					whitelist_builder.put(id, lootTable);
+					whitelist_builder.put(new LootDataId<>(LootDataType.TABLE, id), lootTable);
 				}
 			});
 			Collections.shuffle(results, random);
@@ -113,12 +123,17 @@ public class LootTablesMixin implements IMessUpLootTables {
 			}
 		}
 		
-		ImmutableMap.Builder<ResourceLocation, LootTable> builder = ImmutableMap.builder();
+		ImmutableMap.Builder<LootDataId<?>, Object> builder = ImmutableMap.builder();
+		this.elements.forEach((id, o) -> {
+			if(!id.type().equals(LootDataType.TABLE)) {
+				builder.put(id, o);
+			}
+		});
 		for(int i = 0; i < ids.size(); ++i) {
-			builder.put(ids.get(i), results.get(i));
+			builder.put(new LootDataId<>(LootDataType.TABLE, ids.get(i)), results.get(i));
 		}
 		builder.putAll(whitelist_builder.build());
 		
-		this.tables = builder.build();
+		this.elements = builder.build();
 	}
 }

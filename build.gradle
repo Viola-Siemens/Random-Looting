@@ -1,170 +1,80 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        jcenter()
-        mavenCentral()
-        maven { name="sponge"; url 'https://repo.spongepowered.org/repository/maven-public/' }
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'org.spongepowered:mixingradle:0.7.32'
-    }
-}
-
 plugins {
-    id 'eclipse'
+    id 'fabric-loom' version '1.0.+'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '5.1.+'
 }
-apply plugin: 'org.spongepowered.mixin'
 
-version = '1.2.0'
-group = 'com.hexagram2021.randomlooting'
-archivesBaseName = 'randomlooting'
+version = project.mod_version
+group = project.maven_group
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-    mappings channel: 'official', version: '1.18.2'
-
-    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
+loom {
     runs {
-        client {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-
-            property 'forge.logging.console.level', 'debug'
-
-            property 'forge.enabledGameTestNamespaces', 'randomlooting'
-            arg "-mixin.config=randomlooting.mixins.json"
-
-            mods {
-                randomlooting {
-                    source sourceSets.main
-                }
-            }
-        }
-
         server {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-
-            property 'forge.logging.console.level', 'debug'
-
-            property 'forge.enabledGameTestNamespaces', 'randomlooting'
-            arg "-mixin.config=randomlooting.mixins.json"
-
-            mods {
-                randomlooting {
-                    source sourceSets.main
-                }
-            }
+            runDir "run/server"
         }
-
-        gameTestServer {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-
-            property 'forge.logging.console.level', 'debug'
-
-            property 'forge.enabledGameTestNamespaces', 'randomlooting'
-            arg "-mixin.config=randomlooting.mixins.json"
-
-            mods {
-                randomlooting {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-
-            property 'forge.logging.console.level', 'debug'
-
-            args '--mod', 'randomlooting', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-            arg "-mixin.config=randomlooting.mixins.json"
-
-            mods {
-                randomlooting {
-                    source sourceSets.main
-                }
-            }
+        client {
+            runDir "run/client"
         }
     }
 }
-
-sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-    maven { // TOP
-        url "https://cursemaven.com"
+    maven {
+        name = "Fuzs Mod Resources"
+        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
     }
-    maven { //mirror
-        name = "ModMaven"
-        url = "https://modmaven.dev"
+    maven {
+        name 'terraformersmc Maven'
+        url "https://maven.terraformersmc.com"
     }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18.2-40.1.0'
-    
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    modImplementation("net.minecraftforge:forgeconfigapiport-fabric:3.2.4")
+    modImplementation("com.terraformersmc:modmenu:3.2.5")
 }
 
-jar {
-    manifest {
-        attributes([
-                "Specification-Title"     : "Random Looting",
-                "Specification-Vendor"    : "Hexagram",
-                "Specification-Version"   : "1",
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : project.jar.archiveVersion,
-                "Implementation-Vendor"   : "Hexagram",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                'FMLCorePluginContainsFMLMod': 'true'
-        ])
+processResources {
+    inputs.property "version", project.version
+    filteringCharset "UTF-8"
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
     }
 }
 
-jar.finalizedBy('reobfJar')
+def targetJavaVersion = 17
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        it.options.release = targetJavaVersion
+    }
+}
+
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+    archivesBaseName = project.archives_base_name
+    withSourcesJar()
+}
+
+jar {
+    from("LICENSE")
+}
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact jar
+            from components.java
         }
     }
+
     repositories {
-        maven {
-            url "file://${project.projectDir}/mcmodsrepo"
-        }
     }
-}
-
-mixin {
-    add sourceSets.main, 'randomlooting.refmap.json'
-    config 'randomlooting.mixins.json'
-
-    debug.verbose = true
-    debug.export = true
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
 }

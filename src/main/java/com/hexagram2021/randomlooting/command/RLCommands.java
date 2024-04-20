@@ -3,7 +3,6 @@ package com.hexagram2021.randomlooting.command;
 import com.hexagram2021.randomlooting.config.RLServerConfig;
 import com.hexagram2021.randomlooting.util.IMessUpLootTables;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.Util;
@@ -13,16 +12,10 @@ import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.RegisterCommandsEvent;
 
 import java.util.Random;
 
 public class RLCommands {
-	public static void registerCommands(RegisterCommandsEvent event) {
-		final CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-		dispatcher.register(RLCommands.register());
-	}
-
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
 		return Commands.literal("rl").then(
 				Commands.literal("reshuffle").requires(stack -> stack.hasPermission(RLServerConfig.PERMISSION_LEVEL_RESHUFFLE.get()))

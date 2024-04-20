@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "randomlooting",
+  "version": "${version}",
+
+  "name": "Random Looting",
+  "description": "All loot tables are messed up by this mod. You may be able to get a wheat seed after killing a wither, or get diamonds after breaking oak logs. Can you still beat the game?",
+  "authors": [
+    "Liu Dongyu"
+  ],
+  "contact": {
+    "sources": "https://github.com/Viola-Siemens/Random-Looting"
+  },
+
+  "license": "LGPL",
+  "icon": "logo.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.hexagram2021.randomlooting.RandomLooting"
+    ]
+  },
+  "mixins": [
+    "randomlooting.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.12",
+    "fabric-api": "*",
+    "forgeconfigapiport": ">=3.2 <4",
+    "minecraft": ">=1.18 <1.19",
+    "java": ">=17"
+  }
+}

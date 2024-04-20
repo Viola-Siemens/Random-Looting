@@ -1,12 +1,15 @@
 package com.hexagram2021.randomlooting.util;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import static com.hexagram2021.randomlooting.RandomLooting.MODID;
 
 @SuppressWarnings("unused")
 public class RLLogger {
 	public static boolean debugMode = true;
-	public static Logger logger;
+	public static Logger logger = LogManager.getLogger(MODID);
 
 	public static void log(Level logLevel, Object object) {
 		logger.log(logLevel, String.valueOf(object));

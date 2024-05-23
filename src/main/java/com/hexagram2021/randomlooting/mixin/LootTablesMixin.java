@@ -15,6 +15,7 @@ import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -29,17 +30,18 @@ public class LootTablesMixin implements IMessUpLootTables {
 	@Shadow
 	private Map<ResourceLocation, LootTable> tables;
 	
-	private Map<ResourceLocation, LootTable> backup_tables;
+	@Unique
+	private Map<ResourceLocation, LootTable> rl$backup_tables;
 	
 	@Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At(value = "TAIL"))
 	public void init_backups(Map<ResourceLocation, JsonElement> jsonMap, ResourceManager resourceManager, ProfilerFiller profilerFiller, CallbackInfo ci) {
-		this.backup_tables = ImmutableMap.copyOf(this.tables);
+		this.rl$backup_tables = ImmutableMap.copyOf(this.tables);
 	}
 	
 	@Override
 	public void revoke() {
 		ImmutableMap.Builder<ResourceLocation, LootTable> builder = ImmutableMap.builder();
-		this.backup_tables.forEach(builder::put);
+		this.rl$backup_tables.forEach(builder::put);
 		this.tables = builder.build();
 	}
 	
@@ -52,7 +54,7 @@ public class LootTablesMixin implements IMessUpLootTables {
 		if(RLServerConfig.TYPE_SEPARATED.get()) {
 			Map<ResourceLocation, List<LootTable>> separatedTables = Maps.newHashMap();
 			
-			this.backup_tables.forEach((id, lootTable) -> {
+			this.rl$backup_tables.forEach((id, lootTable) -> {
 				if(!RLServerConfig.WHITELIST_LOOTS.get().contains(id.toString())) {
 					ResourceLocation type = LootContextParamSets.getKey(lootTable.getParamSet());
 					if(type != null && !RLServerConfig.WHITELIST_LOOT_TYPES.get().contains(type.toString())) {
@@ -69,7 +71,7 @@ public class LootTablesMixin implements IMessUpLootTables {
 				Collections.shuffle(lootTableList, random);
 			});
 			
-			this.backup_tables.forEach((id, lootTable) -> {
+			this.rl$backup_tables.forEach((id, lootTable) -> {
 				if(!RLServerConfig.WHITELIST_LOOTS.get().contains(id.toString())) {
 					ResourceLocation type = LootContextParamSets.getKey(lootTable.getParamSet());
 					if (type != null && !RLServerConfig.WHITELIST_LOOT_TYPES.get().contains(type.toString())) {
@@ -90,7 +92,7 @@ public class LootTablesMixin implements IMessUpLootTables {
 				}
 			});
 		} else {
-			this.backup_tables.forEach((id, lootTable) -> {
+			this.rl$backup_tables.forEach((id, lootTable) -> {
 				if(!RLServerConfig.WHITELIST_LOOTS.get().contains(id.toString())) {
 					ResourceLocation type = LootContextParamSets.getKey(lootTable.getParamSet());
 					if (type != null && !RLServerConfig.WHITELIST_LOOT_TYPES.get().contains(type.toString())) {

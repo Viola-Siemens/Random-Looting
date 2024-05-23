@@ -24,7 +24,7 @@ base {
     archivesName = 'randomlooting'
 }
 
-version = '3.0.0'
+version = '3.0.1'
 group = 'com.hexagram2021.randomlooting'
 archivesBaseName = 'randomlooting'
 
@@ -150,6 +150,7 @@ jar {
                 'FMLCorePluginContainsFMLMod': 'true'
         ])
     }
+    from("LICENSE")
 }
 
 jar.finalizedBy('reobfJar')

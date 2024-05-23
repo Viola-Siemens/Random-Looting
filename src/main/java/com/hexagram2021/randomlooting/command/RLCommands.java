@@ -52,7 +52,7 @@ public class RLCommands {
 
 	private static int revoke(MinecraftServer server) {
 		RLServerConfig.DISABLE.set(true);
-		((IMessUpLootTables) server.getLootTables()).revoke();
+		((IMessUpLootTables) server.getLootTables()).rl$revoke();
 		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomlooting.revoke.success"), ChatType.SYSTEM);
 		return Command.SINGLE_SUCCESS;
 	}
@@ -60,6 +60,6 @@ public class RLCommands {
 	public static void messup(MinecraftServer server) {
 		long seed = server.getWorldData().worldGenSettings().seed() ^ RLServerConfig.SALT.get();
 		Random random = new Random(seed);
-		((IMessUpLootTables) server.getLootTables()).messup(random);
+		((IMessUpLootTables) server.getLootTables()).rl$messup(random);
 	}
 }

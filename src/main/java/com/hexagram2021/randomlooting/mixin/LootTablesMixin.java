@@ -39,14 +39,14 @@ public class LootTablesMixin implements IMessUpLootTables {
 	}
 	
 	@Override
-	public void revoke() {
+	public void rl$revoke() {
 		ImmutableMap.Builder<ResourceLocation, LootTable> builder = ImmutableMap.builder();
 		this.rl$backup_tables.forEach(builder::put);
 		this.tables = builder.build();
 	}
 	
 	@Override
-	public void messup(Random random) {
+	public void rl$messup(Random random) {
 		List<ResourceLocation> ids = Lists.newArrayList();
 		List<LootTable> results = Lists.newArrayList();
 		ImmutableMap.Builder<ResourceLocation, LootTable> whitelist_builder = ImmutableMap.builder();

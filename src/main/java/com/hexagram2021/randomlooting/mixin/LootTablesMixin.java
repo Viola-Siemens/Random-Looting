@@ -42,7 +42,7 @@ public class LootTablesMixin implements IMessUpLootTables {
 	}
 	
 	@Override
-	public void revoke() {
+	public void rl$revoke() {
 		ImmutableMap.Builder<LootDataId<?>, Object> builder = ImmutableMap.builder();
 		this.elements.forEach((id, o) -> {
 			if(!id.type().equals(LootDataType.TABLE)) {
@@ -54,7 +54,7 @@ public class LootTablesMixin implements IMessUpLootTables {
 	}
 	
 	@Override
-	public void messup(Random random) {
+	public void rl$messup(Random random) {
 		List<ResourceLocation> ids = Lists.newArrayList();
 		List<LootTable> results = Lists.newArrayList();
 		ImmutableMap.Builder<LootDataId<?>, Object> whitelist_builder = ImmutableMap.builder();

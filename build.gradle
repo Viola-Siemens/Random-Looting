@@ -18,7 +18,7 @@ plugins {
 }
 apply plugin: 'org.spongepowered.mixin'
 
-version = '2.3.0'
+version = '2.3.1'
 group = 'com.hexagram2021.randomlooting'
 archivesBaseName = 'randomlooting'
 
@@ -140,6 +140,7 @@ jar {
                 'FMLCorePluginContainsFMLMod': 'true'
         ])
     }
+    from("LICENSE")
 }
 
 jar.finalizedBy('reobfJar')

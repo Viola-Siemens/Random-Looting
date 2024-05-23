@@ -11,6 +11,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -31,20 +32,22 @@ public abstract class MinecraftServerMixin {
 	@Shadow
 	public abstract PlayerList getPlayerList();
 
-	private int lastAutoRefreshRecipeTick = 0;
+	@Unique
+	private int rl$lastAutoRefreshLootTableTick = 0;
 	
-	private boolean nextReshuffle = true;
+	@Unique
+	private boolean rl$nextReshuffle = true;
 
 	@Inject(method = "tickServer", at = @At(value = "TAIL"))
 	public void tryReshuffling(BooleanSupplier hasTime, CallbackInfo ci) {
 		long second = RLServerConfig.AUTO_REFRESH_SECOND.get();
-		if(second > 0 && this.tickCount - this.lastAutoRefreshRecipeTick >= second * 20) {
+		if(second > 0 && this.tickCount - this.rl$lastAutoRefreshLootTableTick >= second * 20) {
 			if(RLServerConfig.DISABLE.get()) {
-				this.nextReshuffle = false;
-			} else if(this.nextReshuffle) {
-				this.lastAutoRefreshRecipeTick = this.tickCount;
-				RLLogger.debug("Auto refresh recipes!");
-				this.profiler.push("randomlooting:refresh_recipes");
+				this.rl$nextReshuffle = false;
+			} else if(this.rl$nextReshuffle) {
+				this.rl$lastAutoRefreshLootTableTick = this.tickCount;
+				RLLogger.debug("Auto refresh loot tables!");
+				this.profiler.push("randomlooting:refresh_loot_tables");
 				RLServerConfig.SALT.set(this.random.nextLong());
 				RLCommands.messup((MinecraftServer)(Object)this);
 				if(RLServerConfig.AUTO_REFRESH_CALLBACK.get()) {
@@ -52,8 +55,8 @@ public abstract class MinecraftServerMixin {
 				}
 				this.profiler.pop();
 			} else {
-				this.lastAutoRefreshRecipeTick = this.tickCount;
-				this.nextReshuffle = true;
+				this.rl$lastAutoRefreshLootTableTick = this.tickCount;
+				this.rl$nextReshuffle = true;
 			}
 		}
 	}

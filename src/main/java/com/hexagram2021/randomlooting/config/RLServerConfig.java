@@ -3,24 +3,24 @@ package com.hexagram2021.randomlooting.config;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.List;
 
 public class RLServerConfig {
-	public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-	public static final ForgeConfigSpec SPEC;
+	public static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+	public static final ModConfigSpec SPEC;
 
-	public static final ForgeConfigSpec.LongValue SALT;
-	public static final ForgeConfigSpec.BooleanValue DISABLE;
-	public static final ForgeConfigSpec.IntValue PERMISSION_LEVEL_RESHUFFLE;
-	public static final ForgeConfigSpec.IntValue PERMISSION_LEVEL_REVOKE;
-	public static final ForgeConfigSpec.BooleanValue TYPE_SEPARATED;
-	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> WHITELIST_LOOT_TYPES;
-	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> WHITELIST_LOOTS;
+	public static final ModConfigSpec.LongValue SALT;
+	public static final ModConfigSpec.BooleanValue DISABLE;
+	public static final ModConfigSpec.IntValue PERMISSION_LEVEL_RESHUFFLE;
+	public static final ModConfigSpec.IntValue PERMISSION_LEVEL_REVOKE;
+	public static final ModConfigSpec.BooleanValue TYPE_SEPARATED;
+	public static final ModConfigSpec.ConfigValue<List<? extends String>> WHITELIST_LOOT_TYPES;
+	public static final ModConfigSpec.ConfigValue<List<? extends String>> WHITELIST_LOOTS;
 
-	public static final ForgeConfigSpec.IntValue AUTO_REFRESH_SECOND;
-	public static final ForgeConfigSpec.BooleanValue AUTO_REFRESH_CALLBACK;
+	public static final ModConfigSpec.IntValue AUTO_REFRESH_SECOND;
+	public static final ModConfigSpec.BooleanValue AUTO_REFRESH_CALLBACK;
 
 	static {
 		BUILDER.push("randomlooting-server-config");

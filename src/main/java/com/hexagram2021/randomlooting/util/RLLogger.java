@@ -1,13 +1,15 @@
 package com.hexagram2021.randomlooting.util;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import static com.hexagram2021.randomlooting.RandomLooting.MODID;
 
 @SuppressWarnings("unused")
 public class RLLogger {
 	public static boolean debugMode = true;
-	@SuppressWarnings("NotNullFieldNotInitialized")
-	public static Logger logger;
+	public static Logger logger = LogManager.getLogger(MODID);
 
 	public static void log(Level logLevel, Object object) {
 		logger.log(logLevel, String.valueOf(object));
@@ -38,12 +40,10 @@ public class RLLogger {
 	}
 
 	public static void debug(Object object) {
-		if(debugMode)
-			log(Level.INFO, "[DEBUG:] "+object);
+		logger.log(Level.DEBUG, object);
 	}
 
-	public static void debug(String format, Object... params) {
-		if(debugMode)
-			info("[DEBUG:] "+format, params);
+	public static void debug(String message, Object... params) {
+		logger.log(Level.DEBUG, message, params);
 	}
 }

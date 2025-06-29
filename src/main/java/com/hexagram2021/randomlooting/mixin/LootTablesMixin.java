@@ -11,6 +11,7 @@ import net.minecraft.world.level.storage.loot.LootDataId;
 import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootDataType;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -58,6 +59,7 @@ public class LootTablesMixin implements IMessUpLootTables {
 		List<ResourceLocation> ids = Lists.newArrayList();
 		List<LootTable> results = Lists.newArrayList();
 		ImmutableMap.Builder<LootDataId<?>, Object> whitelist_builder = ImmutableMap.builder();
+		final Map<LootContextParamSet, ResourceLocation> inverseRegistry = LootContextParamSets.REGISTRY.inverse();
 		
 		assert this.rl$backup_tables != null;
 		if(RLServerConfig.TYPE_SEPARATED.get()) {
@@ -65,7 +67,7 @@ public class LootTablesMixin implements IMessUpLootTables {
 			
 			this.rl$backup_tables.forEach((id, lootTable) -> {
 				if(!RLServerConfig.WHITELIST_LOOTS.get().contains(id.toString())) {
-					ResourceLocation type = LootContextParamSets.getKey(lootTable.getParamSet());
+					ResourceLocation type = inverseRegistry.get(lootTable.getParamSet());
 					if(type != null && !RLServerConfig.WHITELIST_LOOT_TYPES.get().contains(type.toString())) {
 						separatedTables.computeIfAbsent(
 								type,
@@ -82,7 +84,7 @@ public class LootTablesMixin implements IMessUpLootTables {
 			
 			this.rl$backup_tables.forEach((id, lootTable) -> {
 				if(!RLServerConfig.WHITELIST_LOOTS.get().contains(id.toString())) {
-					ResourceLocation type = LootContextParamSets.getKey(lootTable.getParamSet());
+					ResourceLocation type = inverseRegistry.get(lootTable.getParamSet());
 					if (type != null && !RLServerConfig.WHITELIST_LOOT_TYPES.get().contains(type.toString())) {
 						List<LootTable> listWithType = separatedTables.get(type);
 						ids.add(id);
@@ -103,7 +105,7 @@ public class LootTablesMixin implements IMessUpLootTables {
 		} else {
 			this.rl$backup_tables.forEach((id, lootTable) -> {
 				if(!RLServerConfig.WHITELIST_LOOTS.get().contains(id.toString())) {
-					ResourceLocation type = LootContextParamSets.getKey(lootTable.getParamSet());
+					ResourceLocation type = inverseRegistry.get(lootTable.getParamSet());
 					if (type != null && !RLServerConfig.WHITELIST_LOOT_TYPES.get().contains(type.toString())) {
 						ids.add(id);
 						results.add(lootTable);
